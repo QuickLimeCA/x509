@@ -58,7 +58,7 @@ pub mod x509 {
 mod tests {
     extern crate simple_asn1;
 
-    use self::simple_asn1::{der_decode, der_encode, ASN1DecodeErr};
+    use self::simple_asn1::{der_decode, der_encode, from_der, FromASN1, ASN1Block, ASN1DecodeErr};
 
     use super::x509::Version;
 
@@ -108,5 +108,24 @@ mod tests {
     fn version_should_err_when_unsupported_version_supplied() {
         let error = der_decode::<Version>(&vec![0x02, 0x01, 0x03]).unwrap_err();
         assert_eq!(error, ASN1DecodeErr::UTF8DecodeFailure)
+    }
+
+    #[test]
+    fn version_should_not_break_decoding_subsequent_blocks() {
+        // ASN.1 Sequence of 3 Versions: v1, v2 & v3
+        let test_data = vec![0x30, 0x09, 0x02, 0x01, 0x00, 0x02, 0x01, 0x01, 0x02, 0x01, 0x02];
+        let expected = vec![Version::V1, Version::V2, Version::V3];
+        let seq = &from_der(&test_data).unwrap()[0];
+        match seq {
+            &ASN1Block::Sequence(_, _, ref blocks) => {
+                let (first_actual, first_tail) = Version::from_asn1(&blocks).unwrap();
+                let (second_actual, second_tail) = Version::from_asn1(&first_tail).unwrap();
+                let (third_actual, _) = Version::from_asn1(&second_tail).unwrap();
+                assert_eq!(expected[0], first_actual);
+                assert_eq!(expected[1], second_actual);
+                assert_eq!(expected[2], third_actual);
+            },
+            _ => panic!("Not a sequence")
+        }
     }
 }
