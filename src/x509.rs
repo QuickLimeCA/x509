@@ -1,10 +1,7 @@
 pub mod x509 {
-    extern crate simple_asn1;
-    extern crate num;
-
-    use self::simple_asn1::{ToASN1, FromASN1, ASN1Block, ASN1Class, ASN1DecodeErr, ASN1EncodeErr};
-    use self::num::bigint::BigInt;
-    use self::num::ToPrimitive;
+    use simple_asn1::{ToASN1, FromASN1, ASN1Block, ASN1Class, ASN1DecodeErr, ASN1EncodeErr};
+    use num::bigint::BigInt;
+    use num::ToPrimitive;
 
     #[derive(Debug, PartialEq)]
     pub enum Version {
@@ -85,9 +82,7 @@ pub mod x509 {
 
 #[cfg(test)]
 mod version_tests {
-    extern crate simple_asn1;
-
-    use self::simple_asn1::{der_decode, der_encode, from_der, FromASN1, ASN1Block, ASN1DecodeErr};
+    use simple_asn1::{der_decode, der_encode, from_der, FromASN1, ASN1Block, ASN1DecodeErr};
 
     use super::x509::Version;
 
@@ -161,9 +156,7 @@ mod version_tests {
 
 #[cfg(test)]
 mod certificate_serial_numbers_tests {
-    extern crate simple_asn1;
-
-    use self::simple_asn1::{der_decode, der_encode, from_der, FromASN1, ASN1Block, ASN1DecodeErr};
+    use simple_asn1::{der_decode, der_encode};
 
     use super::x509::CertificateSerialNumber;
 
